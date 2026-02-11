@@ -1,0 +1,3 @@
+[submodule "vipe"]
+	path = vipe
+	url = git@github.com:nv-tlabs/vipe.git
