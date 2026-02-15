@@ -1,7 +1,15 @@
-.PHONY: py-install vipe-install
+.PHONY: update-submodules update-lfs pull py-install vipe-install
 
 VENV := .venv
 PYTHON := python3
+
+update-submodules:
+	git submodule update --init --recursive
+
+update-lfs:
+	git lfs pull
+
+pull: update-submodules update-lfs
 
 py-install:
 	$(PYTHON) -m venv $(VENV)
