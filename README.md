@@ -3,7 +3,7 @@
 ## Dependencies
 **conda**
 
-Used by vipe.
+Used by gaussian-splatting.
 
 **git lfs**
 
@@ -18,6 +18,7 @@ apt install git-lfs
 **cuda**
 
 VIPE needs CUDA version 12.8.
+Gaussian-splatting needs 11.8
 
 To change CUDA version use:
 ```
