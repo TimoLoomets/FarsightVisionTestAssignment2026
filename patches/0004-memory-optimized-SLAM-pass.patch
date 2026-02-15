@@ -1,4 +1,4 @@
-From e7d62b00615753e8aaca0db509b7176e777620db Mon Sep 17 00:00:00 2001
+From 1545955385db84b160ba55fa5821b4909e7c6543 Mon Sep 17 00:00:00 2001
 From: Timo Loomets <timo.loomets@gmail.com>
 Date: Sun, 15 Feb 2026 13:44:37 +0200
 Subject: [PATCH] Memory optimized SLAM pass
@@ -8,7 +8,7 @@ Subject: [PATCH] Memory optimized SLAM pass
  1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/vipe/slam/system.py b/vipe/slam/system.py
-index a8b23fe..5cb0077 100644
+index a8b23fe..6ac4249 100644
 --- a/vipe/slam/system.py
 +++ b/vipe/slam/system.py
 @@ -14,6 +14,7 @@
@@ -19,7 +19,7 @@ index a8b23fe..5cb0077 100644
  
  import numpy as np
  import rerun as rr
-@@ -288,9 +289,11 @@ class SLAMSystem:
+@@ -288,11 +289,13 @@ class SLAMSystem:
  
          # Infill poses and attributes for non-keyframe frames.
          self.inner_filler.set_start_idx(self.buffer.n_frames)
@@ -28,12 +28,14 @@ index a8b23fe..5cb0077 100644
 -        ):
 +
 +        video_iters = [iter(vs) for vs in video_streams]
-+        print("SLAM Pass (2/2)")
-+        for frame_idx, frame_data_list in enumerate(zip(*video_iters)):
-+            gc.collect()
++        for frame_idx, frame_data_list in pbar(enumerate(zip(*video_iters)), desc="SLAM Pass (2/2)", total=total_n_frames):
              images, buffer_masks = self._precompute_features(frame_data_list)
              self._add_keyframe(frame_idx, images, buffer_masks, frame_data_list, phase=2)
++            del images, buffer_masks
++            gc.collect()
              if self.inner_filler.check() or frame_idx == total_n_frames - 1:
+                 self.inner_filler.compute()
+ 
 -- 
 2.43.0
 
