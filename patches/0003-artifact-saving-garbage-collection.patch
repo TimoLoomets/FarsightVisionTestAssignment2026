@@ -1,0 +1,54 @@
+From 632a18b800ca5f2207caac803f69d04cc2ef1aad Mon Sep 17 00:00:00 2001
+From: Timo Loomets <timo.loomets@gmail.com>
+Date: Sun, 15 Feb 2026 13:36:14 +0200
+Subject: [PATCH] Artifact saving garbage collection for reduced RAM usage
+
+---
+ vipe/pipeline/default.py | 3 +++
+ vipe/utils/io.py         | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/vipe/pipeline/default.py b/vipe/pipeline/default.py
+index 69aa1c5..e45c245 100644
+--- a/vipe/pipeline/default.py
++++ b/vipe/pipeline/default.py
+@@ -18,6 +18,7 @@ import logging
+ import pickle
+ 
+ from pathlib import Path
++import gc
+ 
+ import torch
+ 
+@@ -135,6 +136,8 @@ class DefaultAnnotationPipeline(Pipeline):
+         # Dumping artifacts for all views in the streams
+         for output_stream, artifact_path in zip(output_streams, artifact_paths):
+             artifact_path.meta_info_path.parent.mkdir(exist_ok=True, parents=True)
++            gc.collect()
++
+             if self.out_cfg.save_artifacts:
+                 logger.info(f"Saving artifacts to {artifact_path}")
+                 io.save_artifacts(artifact_path, output_stream)
+diff --git a/vipe/utils/io.py b/vipe/utils/io.py
+index bae8aab..fb079b9 100644
+--- a/vipe/utils/io.py
++++ b/vipe/utils/io.py
+@@ -20,6 +20,7 @@ import zipfile
+ from dataclasses import dataclass
+ from pathlib import Path
+ from typing import Iterator
++import gc
+ 
+ import cv2
+ import imageio
+@@ -366,6 +367,7 @@ def save_artifacts(out_path: ArtifactPath, cached_final_stream: VideoStream) ->
+         out_path.mask_path.parent.mkdir(exist_ok=True, parents=True)
+         with zipfile.ZipFile(out_path.mask_path, "w", zipfile.ZIP_DEFLATED) as z:
+             for frame_idx, instance in instance_list:
++                gc.collect()
+                 _, mask_buffer = cv2.imencode(".png", instance.cpu().numpy().astype(np.uint8))
+                 z.writestr(f"{frame_idx:05d}.png", mask_buffer.tobytes())
+ 
+-- 
+2.43.0
+
