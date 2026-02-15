@@ -11,3 +11,13 @@ py-install:
 
 vipe-install:
 	$(VENV)/bin/pip install --no-build-isolation -e vipe/.
+
+apply-patches:
+	@echo "Applying patches"
+	@for patch in patches/*.patch; do \
+		if [ -f "$$patch" ]; then \
+			echo "Applying $$patch"; \
+			(cd vipe && git am "$$OLDPWD/$$patch") || exit 1; \
+		fi \
+	done
+	@echo "All patches applied successfully!"

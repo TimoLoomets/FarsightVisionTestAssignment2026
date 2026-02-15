@@ -1,0 +1,37 @@
+From 97ca5756b75aa8e07254e72090896230dcaccf0b Mon Sep 17 00:00:00 2001
+From: Timo Loomets <timo.loomets@gmail.com>
+Date: Sun, 15 Feb 2026 13:22:07 +0200
+Subject: [PATCH] Garbage collection to video writing to reduce RAM usage
+
+---
+ vipe/utils/visualization.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/vipe/utils/visualization.py b/vipe/utils/visualization.py
+index 58ee013..89d4634 100644
+--- a/vipe/utils/visualization.py
++++ b/vipe/utils/visualization.py
+@@ -23,6 +23,7 @@ import torch
+ 
+ from PIL import Image, ImageDraw, ImageFont
+ from pycg import image
++import gc
+ 
+ from vipe.ext.lietorch import SE3
+ from vipe.slam.interface import SLAMOutput
+@@ -461,10 +462,12 @@ def save_projection_video(
+         ]
+         for t_arr in attributes
+     ]
++    gc.collect()
+     with VideoWriter(video_path, video_stream.fps()) as vw:
+         trajectory_length = 0.0
+         last_pose = video_stream[0].pose
+         for frame_idx, frame_data in pbar(enumerate(video_stream), total=len(video_stream), desc="Writing viz video"):
++            gc.collect()
+             img_rows = []
+             for img_iterator in img_iterators:
+                 img_row = []
+-- 
+2.43.0
+

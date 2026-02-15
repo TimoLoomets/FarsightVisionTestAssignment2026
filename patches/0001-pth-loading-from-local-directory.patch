@@ -1,0 +1,50 @@
+From 04936ba2a13534b485a7308713a2261dcff94f43 Mon Sep 17 00:00:00 2001
+From: Timo Loomets <timo.loomets@gmail.com>
+Date: Sun, 15 Feb 2026 13:19:48 +0200
+Subject: [PATCH] pth loading from local directory with fallback to googledrive
+ to improve speed and solve google drive errors
+
+---
+ vipe/priors/track_anything/__init__.py | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/vipe/priors/track_anything/__init__.py b/vipe/priors/track_anything/__init__.py
+index 4f17155..9839cb5 100644
+--- a/vipe/priors/track_anything/__init__.py
++++ b/vipe/priors/track_anything/__init__.py
+@@ -8,6 +8,9 @@ import gdown
+ import numpy as np
+ import torch
+ 
++import shutil
++import os
++
+ from vipe.streams.base import VideoFrame
+ 
+ from .seg_tracker import SegTracker
+@@ -31,12 +34,16 @@ class TrackAnythingPipeline:
+ 
+         aot_ckpt_path = Path(torch.hub.get_dir()) / "aot" / "R50_DeAOTL_PRE_YTB_DAV.pth"
+         if not aot_ckpt_path.exists():
+-            aot_ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+-            gdown.download(
+-                "https://drive.google.com/file/d/1QoChMkTVxdYZ_eBlZhK2acq9KMQZccPJ/view",
+-                output=str(aot_ckpt_path),
+-                fuzzy=True,
+-            )
++            try:
++                local_backup_path = Path(os.path.dirname(os.path.abspath(__file__))) / ".." / ".." / ".." / ".." / "checkpoints" / "R50_DeAOTL_PRE_YTB_DAV.pth"
++                shutil.copy(local_backup_path, aot_ckpt_path)
++            except:
++                aot_ckpt_path.parent.mkdir(parents=True, exist_ok=True)
++                gdown.download(
++                    "https://drive.google.com/file/d/1QoChMkTVxdYZ_eBlZhK2acq9KMQZccPJ/view",
++                    output=str(aot_ckpt_path),
++                    fuzzy=True,
++                )
+ 
+         self.threshold_args = {
+             "box_threshold": 0.35,
+-- 
+2.43.0
+
