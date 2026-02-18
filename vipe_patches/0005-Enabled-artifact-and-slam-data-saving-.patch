@@ -1,0 +1,30 @@
+From 11e277d5e17c1f8d88a338fabeee95b24244ae41 Mon Sep 17 00:00:00 2001
+From: Timo Loomets <timo.loomets@gmail.com>
+Date: Wed, 18 Feb 2026 15:37:23 +0200
+Subject: [PATCH] Enabled artifact and slam data saving in default
+ configuration
+
+---
+ configs/pipeline/default.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configs/pipeline/default.yaml b/configs/pipeline/default.yaml
+index f97f504..b641477 100644
+--- a/configs/pipeline/default.yaml
++++ b/configs/pipeline/default.yaml
+@@ -36,10 +36,10 @@ output:
+   skip_exists: false
+ 
+   # Save artifacts and a info file
+-  save_artifacts: false
++  save_artifacts: true
+ 
+   # Save reconstruction from SLAM
+-  save_slam_map: false
++  save_slam_map: true
+ 
+   # Visualization videos to BASE_PATH/vipe/xxx.mp4
+   save_viz: true
+-- 
+2.43.0
+

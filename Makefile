@@ -1,11 +1,11 @@
-.PHONY: update-submodules update-lfs pull py-install vipe-install
+.PHONY: update-submodules update-lfs pull vipe-install vipe-install apply-patches visualize
 
-GS_VENV := .gs_venv
-VENV := .venv
+VIPE_VENV := .vipe_venv
 PYTHON := python3
 
-install-conda:
-	wget -qO ~/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && bash ~/miniconda.sh -b -p $HOME/miniconda3 && rm ~/miniconda.sh && eval "$($HOME/miniconda3/bin/conda shell.bash hook)" && conda init
+install-git-lfs:
+	sudo apt update
+	sudo apt install git-lfs
 
 update-submodules:
 	git submodule update --init --recursive
@@ -15,14 +15,12 @@ update-lfs:
 
 pull: update-submodules update-lfs
 
-py-install:
-	$(PYTHON) -m venv $(VENV)
-	$(VENV)/bin/pip install --upgrade pip
-	$(VENV)/bin/pip install -r requirements.txt
-	$(VENV)/bin/pip install -r vipe/envs/requirements.txt --extra-index-url https://download.pytorch.org/whl/cu128
-
 vipe-install:
-	$(VENV)/bin/pip install --no-build-isolation -e vipe/.
+	$(PYTHON) -m venv $(VIPE_VENV)
+	$(VIPE_VENV)/bin/pip install --upgrade pip
+	$(VIPE_VENV)/bin/pip install -r requirements.txt
+	$(VIPE_VENV)/bin/pip install -r vipe/envs/requirements.txt --extra-index-url https://download.pytorch.org/whl/cu128
+	$(VIPE_VENV)/bin/pip install --no-build-isolation -e vipe/.
 
 apply-patches:
 	@echo "Applying patches"
@@ -36,18 +34,5 @@ apply-patches:
 		done
 	@echo "All patches applied successfully!"
 
-gs-install:
-	@echo "Creating conda environment '$(GS_VENV)'..."
-	conda env create -f gaussian-splatting/environment.yml -n $(GS_VENV)
-	@echo "Environment '$(GS_VENV)' created successfully."
-
-# Optional: update an existing environment
-gs-update:
-	@echo "Updating conda environment '$(GS_VENV)'..."
-	conda env update -f gaussian-splatting/environment.yml -n $(GS_VENV)
-	@echo "Environment '$(GS_VENV)' updated successfully."
-
-# Activate environment (example)
-gs-activate:
-	@echo "To activate the environment, run:"
-	@echo "conda activate $(GS_VENV)"
+visualize:
+	vipe visualize vipe_results

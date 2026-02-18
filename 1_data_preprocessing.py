@@ -8,7 +8,7 @@ from tqdm import tqdm
 image_folder = 'data'
 output_video = 'input.mp4'
 
-max_width = 1600
+max_width = 2000
 
 # Get all JPG files in the folder and sort them
 images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
